@@ -1,49 +1,130 @@
-# claude-mods-custom-box
+<h1 align="center">claude-mods-custom-box</h1>
 
-Claude Code 용 mod 모음입니다. 저장소 하나가 marketplace 이고, mod 는 `plugins/` 아래에 하나씩 들어갑니다.
+<p align="center">
+  <a href="https://github.com/SungsooKwon/claude-mods-custom-box"><img src="https://img.shields.io/github/stars/SungsooKwon/claude-mods-custom-box?style=flat&amp;label=%E2%98%85&amp;color=08C" alt="GitHub stars" /></a>
+  <img src="https://img.shields.io/badge/license-MIT-08C?style=flat" alt="License: MIT" />
+  <img src="https://img.shields.io/badge/Claude%20Code-mods-D97757?style=flat" alt="Claude Code mods" />
+  <img src="https://img.shields.io/badge/terminal-macOS%20%7C%20Windows%20%7C%20Linux-4493F8?style=flat-square" alt="Runs in the Claude Code terminal on macOS, Windows and Linux" />
+</p>
 
-| mod | 설명 |
-| --- | --- |
-| [usagi-code](plugins/usagi-code) | 프롬프트 위 pane 에서 Usagi 가 Claude 가 하는 일을 연기하고, 지시 순서·서브에이전트·진행 상황을 옆에 보여 줍니다. [clockendbader/mascot-studio](https://github.com/clockendbader/mascot-studio) (MIT) 를 옮겨 고쳤습니다. |
+<p align="center">
+  <sub>English · <a href="docs/readme/README.ko.md">한국어</a></sub>
+</p>
 
-## 설치
+<p align="center">
+  <strong>Small mods that make Claude Code feel alive.</strong><br/>
+  One marketplace, many mods — install the ones you like with a single line.
+</p>
 
-터미널의 Claude Code 프롬프트에서:
+<h3 align="center"><a href="#install"><ins>Install a mod</ins></a></h3>
+
+<p align="center">
+  <img src="docs/assets/usagi-hero.gif" alt="Usagi thinking, typing at a keyboard while a tool runs, then standing still on a meadow" width="640" />
+</p>
+
+## Mods
+
+<table>
+<tr>
+<td width="50%" valign="middle">
+
+### Usagi code
+
+A pane above the prompt where Usagi acts out what Claude is doing — typing while a tool runs, a thinking bubble between steps, standing by when it's your turn. Beside it: your order, the subagents, and live progress.
+
+`/plugin install usagi-code --marketplace SungsooKwon/claude-mods-custom-box`
+
+[Usage ↓](#usagi-code-usage)
+
+</td>
+<td width="50%">
+  <img src="docs/assets/usagi-hero.gif" alt="Usagi code stage" width="100%" />
+</td>
+</tr>
+<tr>
+<td width="50%" valign="middle">
+
+### Screensaver
+
+Walk away and the stage turns into a 90s screensaver — growing pipes, a starfield, and tiny flying mascots — until Claude moves again.
+
+Set the idle minutes with `/plugin configure usagi-code` (0 turns it off).
+
+</td>
+<td width="50%">
+  <img src="docs/assets/usagi-screensaver.gif" alt="Starfield and pipes screensaver" width="100%" />
+</td>
+</tr>
+</table>
+
+**Also in Usagi code:**
+
+- **Timeline** — the order tree for this turn, the live step with its tool chain, and a progress line (steps, done, failed).
+- **Subagents** — each spawned agent with its type, task, state and the tool it is using now.
+- **Heads-up popups** — a permission prompt or a question pops a dialog (“Usagi: hey! i need ur OK …”); a failed tool shows its first error line.
+- **Usage warnings** — context %, 5-hour and weekly limits in the status bar, with a nudge toward `/compact` and the reset time when you get close.
+- **2010s skins** — Windows 7, Mac OS X and Ubuntu themes, picked from your OS or set by hand.
+- **Resizable stage** — ▲ ▼ in the status bar, or `/usagi +` / `/usagi -`; the size is kept across sessions.
+
+> The pane's labels are in Korean for now.
+
+---
+
+## Install
+
+At the prompt of a Claude Code terminal session:
 
 ```
 /plugin install usagi-code --marketplace SungsooKwon/claude-mods-custom-box
 ```
 
-`Add marketplace?` 에 `y`, 범위는 Enter (user). 옵션 화면이 나오면 설정하고 넘어가면 바로 켜집니다.
+Answer `y` to add the marketplace, then Enter for the user scope. It is active right away.
 
-셸에서:
+_Or from a shell:_
 
-```
+```bash
 claude plugin install usagi-code --marketplace SungsooKwon/claude-mods-custom-box
 ```
 
-데스크톱 앱(`/plugin` 이 안 되는 곳): 프롬프트 옆 + → Plugins → Add marketplace 에 `SungsooKwon/claude-mods-custom-box` → Add plugin.
+_In the desktop app_ (where `/plugin` does not run): click **+** next to the prompt box → **Plugins** → **Add marketplace** with `SungsooKwon/claude-mods-custom-box` → **Add plugin**.
 
-## usagi-code 사용법
+<a id="usagi-code-usage"></a>
 
-| 명령 | 동작 |
+### Usagi code usage
+
+| Command | What it does |
 | --- | --- |
-| `/usagi` | pane 열기 / 닫기 |
-| `/usagi +` · `/usagi -` · `/usagi size <n>` | Usagi 크기(줄 수) 조절 |
-| `/usagi theme <windows7 \| macos \| ubuntu>` | 이번 세션의 테마 변경 |
+| `/usagi` | Open or close the pane |
+| `/usagi +` · `/usagi -` · `/usagi size <n>` | Resize Usagi (rows) |
+| `/usagi theme <windows7 \| macos \| ubuntu>` | Switch the look for this session |
 
-계속 쓸 설정(시작할 때 열기, 화면보호기 분, 테마)은 `/plugin configure usagi-code` 로 바꿉니다. 터미널 전용입니다.
+Lasting settings — open on startup, screensaver minutes, theme — live in `/plugin configure usagi-code`. Terminal only.
 
-## mod 추가하기
+---
 
+## Community &amp; Support
+
+- **Feedback &amp; ideas:** [Open an issue](https://github.com/SungsooKwon/claude-mods-custom-box/issues) — bugs, requests, or a mod you'd like to see.
+- **Show support:** [Star](https://github.com/SungsooKwon/claude-mods-custom-box) this repo to follow new mods.
+
+---
+
+## Developing
+
+Each mod lives in `plugins/<name>/` and is listed in `.claude-plugin/marketplace.json`.
+
+```bash
+scripts/new-mod.sh <mod-name> "One-line description"   # scaffold a mod and list it
+claude --plugin-dir plugins/<mod-name>                  # run Claude Code with it loaded
+scripts/check.sh [mod-name ...]                         # validate + test (all mods when no name)
 ```
-scripts/new-mod.sh <mod-name> "한 줄 설명"   # plugins/<mod-name>/ 뼈대 + marketplace 등록
-claude --plugin-dir plugins/<mod-name>      # 그 mod 를 켠 채로 Claude Code 실행
-scripts/check.sh [mod-name ...]             # validate + 테스트 (이름이 없으면 전부)
-```
 
-새 mod 의 설치 명령은 `/plugin install <mod-name> --marketplace SungsooKwon/claude-mods-custom-box` 입니다. `new-mod.sh` 는 `jq` 를 씁니다.
+A new mod installs with `/plugin install <mod-name> --marketplace SungsooKwon/claude-mods-custom-box`. `new-mod.sh` needs `jq`.
 
-## 라이선스
+## Credits
 
-MIT. usagi-code 는 원작자 저작권 표기를 [plugins/usagi-code/LICENSE](plugins/usagi-code/LICENSE) 에 함께 둡니다.
+Usagi code is ported from [clockendbader/mascot-studio](https://github.com/clockendbader/mascot-studio) (MIT).
+
+## License
+
+Free and open source under the [MIT License](LICENSE). Usagi code keeps the original author's notice in [plugins/usagi-code/LICENSE](plugins/usagi-code/LICENSE).
