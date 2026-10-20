@@ -12,7 +12,7 @@ folders="$(ls plugins | sort)"
 [[ "$listed" == "$folders" ]] || { echo "marketplace.json and plugins/ differ:"; diff <(echo "$listed") <(echo "$folders"); exit 1; }
 for m in $folders; do
   for f in README.md README.ko.md; do
-    [[ "$(grep -c "](plugins/$m[)/]" $f)" -eq 1 ]] || { echo "$f table needs one row for $m" >&2; exit 1; }
+    [[ "$(grep -c "^|.*](plugins/$m[)/]" $f)" -eq 1 ]] || { echo "$f table needs one row for $m" >&2; exit 1; }
     [[ -f "plugins/$m/$f" ]] || { echo "missing plugins/$m/$f" >&2; exit 1; }
   done
 done

@@ -24,7 +24,75 @@
 | <img src="plugins/usagi-code/assets/preview.gif" alt="usagi-code" width="200" /> | [**usagi-code**](plugins/usagi-code/README.ko.md) | 프롬프트 위 pane 에서 Usagi 가 Claude 가 하는 일을 연기하고, 지시 순서·서브에이전트·진행 상황을 옆에 보여 줍니다. |
 <!-- mods:end -->
 
-새 mod 는 계속 추가됩니다. 각 mod 의 이름을 누르면 기능과 사용법이 나옵니다.
+새 mod 는 계속 추가됩니다. 각 mod 의 기능과 사용법은 바로 아래에 있습니다.
+
+## usagi-code
+
+프롬프트 위 pane 에서 Usagi 가 Claude 가 하는 일을 연기합니다. 도구가 도는 동안 키보드를 치고, 단계 사이엔 생각 말풍선을 띄우고, 사용자 차례면 가만히 기다립니다. 옆에는 지시 순서, 서브에이전트, 진행 상황이 실시간으로 나옵니다.
+
+```
+/plugin install usagi-code@claude-mods-custom-box
+```
+
+### 기능
+
+<table>
+<tr>
+<td width="50%" valign="middle">
+
+#### 무대
+
+도구가 돌면 키보드를 치고, 단계 사이엔 생각 말풍선, 차례가 넘어오면 가만히 서서 기다립니다.
+
+</td>
+<td width="50%">
+  <img src="plugins/usagi-code/assets/preview.gif" alt="Usagi code 무대" width="100%" />
+</td>
+</tr>
+<tr>
+<td width="50%" valign="middle">
+
+#### 화면보호기
+
+자리를 비우면 무대가 90년대 화면보호기로 바뀝니다. 자라는 파이프, 별 사이 비행, 날아다니는 작은 마스코트가 나오고, Claude 가 다시 움직이면 돌아옵니다.
+
+</td>
+<td width="50%">
+  <img src="plugins/usagi-code/assets/screensaver.gif" alt="별 사이 비행과 파이프 화면보호기" width="100%" />
+</td>
+</tr>
+</table>
+
+- **타임라인** — 이번 지시의 순서 트리, 지금 단계와 도구 사슬, 진행 줄(단계 수·완료·실패).
+- **서브에이전트** — 띄운 에이전트마다 종류, 맡은 일, 상태, 지금 쓰는 도구.
+- **알림 팝업** — 권한 요청이나 질문이 오면 대화창(“Usagi: hey! i need ur OK …”)이 뜨고, 도구가 실패하면 첫 오류 줄을 보여 줍니다.
+- **사용량 경고** — 상태 표시줄에 컨텍스트 %, 5시간·주간 한도. 한도에 가까워지면 `/compact` 권유와 리셋 시각을 띄웁니다.
+- **2010년대 스킨** — Windows 7, Mac OS X, Ubuntu 테마. OS 에 맞춰 고르거나 직접 지정합니다.
+- **무대 크기 조절** — 상태 표시줄의 ▲ ▼ 또는 `/usagi +` / `/usagi -`. 크기는 세션이 바뀌어도 유지됩니다. 22·20·18줄은 크기마다 손으로 그린 도안입니다.
+
+> pane 안의 문구는 현재 한국어입니다.
+
+### 사용법
+
+| 명령 | 동작 |
+| --- | --- |
+| `/usagi` | pane 열기 / 닫기 |
+| `/usagi +` · `/usagi -` · `/usagi size <n>` | Usagi 크기(줄 수) 조절 |
+| `/usagi theme <windows7 \| macos \| ubuntu>` | 이번 세션의 테마 변경 |
+
+> **22·20·18줄이 가장 자연스럽습니다.** 이 세 크기는 손으로 그린 도안을 그대로 쓰고, 다른 크기는 22줄 그림을 줄이거나 늘려서 픽셀이 빠지면 눈 모양이 어색해질 수 있습니다. `/usagi size 22` 로 기본 크기에 돌아옵니다.
+>
+> 크기별 해상도 차이는 아래 그림과 같습니다(왼쪽부터 생각 중, 키보드 치는 중, 서 있음). 크기를 고를 때 참고하세요.
+
+<p align="center">
+  <img src="plugins/usagi-code/assets/sizes.png" alt="22·20·18줄 크기별 Usagi 해상도 비교" width="720" />
+</p>
+
+계속 쓸 설정(시작할 때 열기, 화면보호기 분, 테마)은 `/plugin configure usagi-code` 에서 바꿉니다. 터미널 전용입니다.
+
+### 출처
+
+[clockendbader/mascot-studio](https://github.com/clockendbader/mascot-studio) (MIT) 를 옮겨 고쳤습니다. 원작자 저작권 표기는 [LICENSE](plugins/usagi-code/LICENSE) 에 함께 있습니다.
 
 ## 설치
 
@@ -62,7 +130,7 @@ claude --plugin-dir plugins/<mod-name>      # 그 mod 를 켠 채로 Claude Code
 scripts/check.sh [mod-name ...]             # 이름이 없으면 전부
 ```
 
-올리기 전에: mod 의 `README.md` 를 채우고, 미리보기를 `plugins/<mod>/assets/preview.gif` 에 두고 README 표의 `—` 를 그 그림으로 바꾸고, `scripts/check.sh` 가 통과하는지 확인합니다. `new-mod.sh` 는 `jq` 가 필요합니다.
+올리기 전에: mod 의 `README.md` 를 채우고 같은 내용을 이 README 의 Mods 아래 `## <mod>` 절로 넣고, 미리보기를 `plugins/<mod>/assets/preview.gif` 에 두고 README 표의 `—` 를 그 그림으로 바꾸고, `scripts/check.sh` 가 통과하는지 확인합니다. `new-mod.sh` 는 `jq` 가 필요합니다.
 
 ## 커뮤니티 · 지원
 
