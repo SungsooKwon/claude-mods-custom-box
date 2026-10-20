@@ -50,7 +50,7 @@ Walk away and the stage turns into a 90s screensaver (growing pipes, a starfield
 - **Heads-up popups** — a permission prompt or a question pops a dialog (“Usagi: hey! i need ur OK …”); a failed tool shows its first error line.
 - **Usage warnings** — context %, 5-hour and weekly limits in the status bar, with a nudge toward `/compact` and the reset time when you get close.
 - **2010s skins** — Windows 7, Mac OS X and Ubuntu themes, picked from your OS or set by hand.
-- **Resizable stage** — ▲ ▼ in the status bar, or `/usagi +` / `/usagi -`; the size is kept across sessions. The art is sharpest at the default 22 rows.
+- **Resizable stage** — ▲ ▼ in the status bar, or `/usagi +` / `/usagi -`; the size is kept across sessions. It looks most natural at the default 22 rows.
 
 > The pane's labels are in Korean for now.
 
@@ -61,6 +61,8 @@ Walk away and the stage turns into a 90s screensaver (growing pipes, a starfield
 | `/usagi` | Open or close the pane |
 | `/usagi +` · `/usagi -` · `/usagi size <n>` | Resize Usagi (rows) |
 | `/usagi theme <windows7 \| macos \| ubuntu>` | Switch the look for this session |
+
+> **Usagi looks most natural at 22 rows.** At other sizes the art is scaled down and drops pixels, so the eyes can look off. `/usagi size 22` brings it back.
 
 Lasting settings (open on startup, screensaver minutes, theme) live in `/plugin configure usagi-code`. Terminal only.
 
