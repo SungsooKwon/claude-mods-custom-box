@@ -34,13 +34,13 @@ marketplace 를 아직 추가하지 않았다면 [저장소 README 의 설치](.
 <tr>
 <td width="50%" valign="middle">
 
-### 화면보호기
+### 졸기
 
-자리를 비우면 무대가 90년대 화면보호기로 바뀝니다. 자라는 파이프, 별 사이 비행, 날아다니는 작은 마스코트가 나오고, Claude 가 다시 움직이면 돌아옵니다.
+아무 일 없이 1분이 지나면 Usagi 가 그 자리에서 졸기 시작합니다. 눈을 감고 숨 쉬듯 오르내리며 콧방울이 커졌다 꺼지고 `z` 가 떠오릅니다. Claude 가 다시 움직이면 깹니다.
 
 </td>
 <td width="50%">
-  <img src="assets/screensaver.gif" alt="별 사이 비행과 파이프 화면보호기" width="100%" />
+  <img src="assets/doze.gif" alt="눈을 감고 콧방울을 부풀리며 조는 Usagi" width="100%" />
 </td>
 </tr>
 </table>
@@ -72,7 +72,7 @@ marketplace 를 아직 추가하지 않았다면 [저장소 README 의 설치](.
 
 **pane 위치는 Claude Code 가 정합니다.** 전체 화면 모드(기본)에서 터미널이 110열 이상이면 대화 오른쪽에 붙고(이때 무대가 다 들어가는 46열 폭을 청합니다), 그보다 좁으면 프롬프트 위에 들어갑니다. 늘 프롬프트 위에 두려면 `CLAUDE_CODE_NO_FLICKER=0 claude` 로 실행하거나 tmux 안에서 실행하세요.
 
-계속 쓸 설정(시작할 때 열기, 화면보호기 분, 테마)은 `/plugin configure usagi-code` 에서 바꿉니다. 터미널 전용입니다.
+계속 쓸 설정(시작할 때 열기, 테마)은 `/plugin configure usagi-code` 에서 바꿉니다. 터미널 전용입니다.
 
 ## 출처
 

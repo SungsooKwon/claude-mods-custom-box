@@ -1,6 +1,6 @@
 // The Stage scene: the cream rabbit from the reference pixel chart (29x37),
 // typing at a keyboard while a tool runs, a thinking bubble between steps,
-// standing still with open eyes otherwise.
+// dozing after a quiet minute, standing still with open eyes otherwise.
 
 import type { Hat, Pose } from '../../types'
 import { TRANSPARENT, newGrid } from './pixels'
@@ -177,6 +177,7 @@ const RABBIT_8 = [
 /**
  * 줄 수마다 손으로 맞춘 장면: 토끼 도안과 왼쪽 위 자리, 키보드 가로 범위·윗줄 y, 두 앞발 x, 말풍선 왼쪽 x.
  * dots 가 있으면 말풍선에 thinking 대신 점 dots 개, mini 면 얇은 키보드와 한 줄짜리 앞발.
+ * 졸 때: eyes 는 감길 눈 왼쪽 위(토끼 기준), snot 은 콧방울이 매달릴 코 자리와 최대 반지름, zs 는 떠오를 z 의 시작 자리(장면 기준)와 큰 글씨 여부.
  */
 type SceneLayout = {
   w: number
@@ -190,15 +191,33 @@ type SceneLayout = {
   bubbleX: number
   dots?: number
   mini?: boolean
+  eyes: readonly (readonly [number, number])[]
+  snot?: { at: readonly [number, number]; max: number }
+  zs: readonly (readonly [number, number, boolean])[]
 }
 
 // pane 이 주는 무대 폭(22줄 42열, 20줄 39열, 18줄 35열, 14줄 28열, 8줄 17열)에 맞췄다, 18줄 이하는 토끼를 가운데 두고 점 말풍선
 const LAYOUTS: Readonly<Record<number, SceneLayout>> = {
-  22: { w: SCENE_W, h: SCENE_H, rabbit: RABBIT, rx: 5, ry: 3, keys: [3, 36], top: 35, paws: [10, 26], bubbleX: 26 },
-  20: { w: 37, h: 40, rabbit: RABBIT_20, rx: 3, ry: 2, keys: [1, 32], top: 31, paws: [7, 23], bubbleX: 23 },
-  18: { w: 33, h: 36, rabbit: RABBIT_18, rx: 3, ry: 2, keys: [1, 32], top: 27, paws: [7, 23], bubbleX: 23, dots: 3 },
-  14: { w: 26, h: 28, rabbit: RABBIT_14, rx: 2, ry: 2, keys: [0, 25], top: 21, paws: [5, 16], bubbleX: 20, dots: 3 },
-  8: { w: 15, h: 16, rabbit: RABBIT_8, rx: 2, ry: 1, keys: [1, 13], top: 12, paws: [3, 8], bubbleX: 12, dots: 1, mini: true },
+  22: {
+    w: SCENE_W, h: SCENE_H, rabbit: RABBIT, rx: 5, ry: 3, keys: [3, 36], top: 35, paws: [10, 26], bubbleX: 26,
+    eyes: [[8, 17], [16, 17]], snot: { at: [14, 21], max: 2 }, zs: [[32, 13, false], [36, 9, true]],
+  },
+  20: {
+    w: 37, h: 40, rabbit: RABBIT_20, rx: 3, ry: 2, keys: [1, 32], top: 31, paws: [7, 23], bubbleX: 23,
+    eyes: [[7, 15], [15, 15]], snot: { at: [13, 19], max: 2 }, zs: [[29, 12, false], [33, 8, true]],
+  },
+  18: {
+    w: 33, h: 36, rabbit: RABBIT_18, rx: 3, ry: 2, keys: [1, 32], top: 27, paws: [7, 23], bubbleX: 23, dots: 3,
+    eyes: [[7, 14], [15, 14]], snot: { at: [13, 18], max: 2 }, zs: [[29, 11, false]],
+  },
+  14: {
+    w: 26, h: 28, rabbit: RABBIT_14, rx: 2, ry: 2, keys: [0, 25], top: 21, paws: [5, 16], bubbleX: 20, dots: 3,
+    eyes: [[5, 10], [12, 10]], snot: { at: [10, 14], max: 1 }, zs: [[23, 8, false]],
+  },
+  8: {
+    w: 15, h: 16, rabbit: RABBIT_8, rx: 2, ry: 1, keys: [1, 13], top: 12, paws: [3, 8], bubbleX: 12, dots: 1, mini: true,
+    eyes: [[2, 7], [7, 7]], zs: [[12, 6, false]],
+  },
 }
 
 /** 손으로 그린 장면이 있는 줄 수면 그 크기, 없으면 undefined (그때는 22줄 장면을 줄여 쓴다). */
@@ -252,10 +271,46 @@ function drawKeyboard(g: Grid, f: number, layout: SceneLayout): void {
   })
 }
 
+// 졸 때: 콧방울 반지름(프레임 8장), 감은 눈 ‿, 떠오르는 z 글꼴
+const SNOT = [0, 1, 1, 2, 2, 2, 1, 0]
+const SNOT_FILL = 0xbfe6ff
+const CLOSED = ['oooo', 'oooo', 'dood', 'oddo']
+const CLOSED_MINI = ['oo', 'dd']
+const Z_SMALL = ['ddd', '..d', '.d.', 'd..', 'ddd']
+const Z_BIG = ['dddd', '...d', '..d.', '.d..', 'd...', 'dddd']
+const Z_INK = 0x6b5a8e
+
+/** 조는 토끼 한 프레임(f 0~7): 눈을 감고 숨 쉬듯 1px 오르내리며, 콧방울이 커졌다 꺼지고 z 가 차례로 떠오른다. */
+function drawAsleep(g: Grid, layout: SceneLayout, f: number): void {
+  const { rabbit, rx, eyes, snot, zs, mini } = layout
+  const ry = layout.ry + ((f >> 1) & 1)
+  stamp(g, rabbit, rx, ry)
+  for (const [ex, ey] of eyes) stamp(g, mini ? CLOSED_MINI : CLOSED, rx + ex, ry + ey)
+  const r = Math.min(snot?.max ?? 0, SNOT[f] ?? 0)
+  if (snot !== undefined && r > 0) {
+    const cx = rx + snot.at[0] + 1 + r
+    const cy = ry + snot.at[1] + 1
+    for (let y = cy - r; y <= cy + r; y++) {
+      for (let x = cx - r; x <= cx + r; x++) if ((x - cx) ** 2 + (y - cy) ** 2 <= r * r + r) put(g, x, y, SNOT_FILL)
+    }
+    put(g, cx - Math.floor(r / 2), cy - Math.floor(r / 2), 0xffffff)
+  }
+  zs.forEach(([zx, zy, big], k) => {
+    if (f < k * 2) return // 둘째 z 는 두 프레임 늦게
+    const top = zy - ((f - k * 2) % 6)
+    ;(big ? Z_BIG : Z_SMALL).forEach((line, dy) => [...line].forEach((ch, dx) => ch === 'd' && put(g, zx + dx, top + dy, Z_INK)))
+  })
+}
+
 /** One frame of a pose (40x44 px at 22 rows, the hand-drawn size at 20, 18, 14 and 8), transparent where the backdrop shows. */
 export function sceneFrame(pose: Pose, _hat: Hat, tick: number, rows = 22): Grid {
   const layout = layoutOf(rows)
   const g = newGrid(layout.w, layout.h, TRANSPARENT)
+  // 조는 건 느리게: 세 틱(약 0.5초)에 한 프레임
+  if (pose === 'asleep') {
+    drawAsleep(g, layout, Math.floor(tick / 3) % POSE_FRAMES.asleep)
+    return g
+  }
   const f = tick % POSE_FRAMES[pose]
   stamp(g, layout.rabbit, layout.rx, layout.ry)
   if (TYPING.has(pose)) drawKeyboard(g, f, layout)

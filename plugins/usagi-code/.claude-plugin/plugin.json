@@ -14,12 +14,6 @@
       "description": "Open the studio when a session starts",
       "default": true
     },
-    "screensaverMinutes": {
-      "type": "number",
-      "title": "Screensaver minutes",
-      "description": "Idle minutes before the screensaver; 0 turns it off",
-      "default": 5
-    },
     "theme": {
       "type": "string",
       "title": "Theme",

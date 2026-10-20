@@ -28,10 +28,18 @@ test('work poses type at a keyboard, the paws moving from frame to frame', () =>
 })
 
 test('the other poses stand still with open eyes', () => {
-  for (const pose of POSES.filter(p => !TYPING.includes(p))) {
+  for (const pose of POSES.filter(p => !TYPING.includes(p) && p !== 'asleep')) {
     expect(has(pose, KEYBOARD)).toBe(false)
     for (const tick of [1, 7]) expect([...sceneFrame(pose, 'none', tick).px]).toEqual([...sceneFrame(pose, 'none', 0).px])
   }
+})
+
+// 조용히 1분 지나면 눈을 감고 z 를 띄우며 존다
+test('asleep dozes with closed eyes and a z drifting up', () => {
+  const frame = (tick: number) => [...sceneFrame('asleep', 'none', tick).px]
+  expect(frame(0)).not.toContain(0xf8fdf9)
+  expect(frame(0)).toContain(0x6b5a8e)
+  expect(frame(0)).not.toEqual(frame(3))
 })
 
 test('thinking shows a white bubble with its word laid over the stage', () => {

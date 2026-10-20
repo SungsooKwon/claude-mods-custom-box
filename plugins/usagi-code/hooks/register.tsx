@@ -31,7 +31,6 @@ const turnStartedAt = atom({ plugin: 'usagi-code', key: 'turnStartedAt' } as con
 const idleSince = atom({ plugin: 'usagi-code', key: 'idleSince' } as const, null as number | null)
 const usage = atom({ plugin: 'usagi-code', key: 'usage' } as const, { rateLimits: [], toolCalls: 0 } as UsageSnapshot)
 const dialog = atom({ plugin: 'usagi-code', key: 'dialog' } as const, null as Dialog)
-const screensaver = atom({ plugin: 'usagi-code', key: 'screensaver' } as const, false)
 // 마지막으로 받은 사용자 지시 첫 줄과, 그 지시로 만들어진 서브에이전트들
 const order = atom({ plugin: 'usagi-code', key: 'order' } as const, '')
 const subagents = atom({ plugin: 'usagi-code', key: 'subagents' } as const, [] as SubAgent[])
@@ -131,12 +130,6 @@ async function resizeStage($: EngineInterface, change: (last: number) => number)
   return size
 }
 
-/** Any activity wakes the screensaver. */
-async function wake($: EngineInterface): Promise<void> {
-  if (await read($, screensaver)) await update($, screensaver, () => false)
-}
-
-const SCREENSAVER_CHECK_TICKS = 6
 
 
 /** Takes the engine's usage figures, if they look like figures. */
@@ -159,8 +152,6 @@ function failureOf(result: unknown): string | undefined {
 }
 
 export const register: Register = (on, options) => {
-  const screensaverMs = Math.max(0, Number(options.screensaverMinutes ?? 5)) * 60_000
-
   on('session.start', async ($, e, next) => {
     folder = folderOf(e.cwd)
     await $.command.register({ name: 'usagi', description: 'Open or close Usagi code' })
@@ -170,10 +161,6 @@ export const register: Register = (on, options) => {
     const animate = async () => {
       tick += 1
       now = await $.clock.now()
-      if (screensaverMs > 0 && tick % SCREENSAVER_CHECK_TICKS === 0) {
-        const quiet = await read($, idleSince)
-        if (quiet !== null && now - quiet >= screensaverMs && !(await read($, screensaver))) await update($, screensaver, () => true)
-      }
       const last = drawn
       if (last === null || last.mounted.size === 0) return
       for (const frame of rasterFrames(last.model, tick, now)) {
@@ -254,7 +241,6 @@ export const register: Register = (on, options) => {
       })
       await update($, activity, () => ({ pose, tool, target, since: started }))
       await update($, idleSince, () => null)
-      await wake($)
       await clearDialog($, 'error')
       if (tool === 'AskUserQuestion') await setDialog($, { kind: 'needs-you', text: QUESTION_TEXT, at: started })
     } catch {
@@ -298,7 +284,6 @@ export const register: Register = (on, options) => {
       const now = await $.clock.now()
       await update($, activity, () => ({ pose: 'thinking', since: now }) as Activity)
       await update($, turnStartedAt, () => now)
-      await wake($)
       await update($, idleSince, () => null)
       await noteTurnStart($, e.agentId, e.text, now)
     } catch {
@@ -376,7 +361,6 @@ export const register: Register = (on, options) => {
   on('prompt.submit', async ($, e, next) => {
     try {
       await clearDialog($, 'needs-you')
-      await wake($)
     } catch {
       // observing only
     }
@@ -430,7 +414,6 @@ export const register: Register = (on, options) => {
     const figures = await read($, usage)
     const quietSince = await read($, idleSince)
     const shownDialog = await read($, dialog)
-    const isSaving = (await read($, screensaver)) && screensaverMs > 0
     const threshold = await read($, compactAt)
     const orderText = await read($, order)
     const agentList = await read($, subagents)
@@ -446,7 +429,6 @@ export const register: Register = (on, options) => {
         hat: hatFor(new Date(at)),
         theme: theme.name,
         idleSince: quietSince,
-        screensaver: isSaving ? { since: (quietSince ?? at) + screensaverMs } : null,
       }
     }
     const rasters = rasterFrames(model, tick, at)

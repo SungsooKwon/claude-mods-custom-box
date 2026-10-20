@@ -171,26 +171,3 @@ export function drawHands(g: Grid, mode: 'type' | 'rest', f: number): void {
     }
   })
 }
-
-/** An 8x5 mini Clawd (the helper, the screensaver's flyer, the usage graph's climber), one arm waving on odd frames. */
-export function drawMiniClawd(g: Grid, x: number, y: number, f: number, mood: 'awake' | 'asleep' | 'sweat' = 'awake'): void {
-  rect(g, x + 1, y, x + 6, y + 2, c('o'))
-  rect(g, x + 2, y, x + 5, y, c('O'))
-  put(g, x + 1, y, TRANSPARENT)
-  put(g, x + 6, y, TRANSPARENT)
-  rect(g, x + 1, y + 2, x + 6, y + 2, c('d'))
-  rect(g, x + 2, y - 2, x + 2, y - 1, c('p'))
-  rect(g, x + 5, y - 2, x + 5, y - 1, c('p'))
-  if (mood === 'asleep') {
-    put(g, x + 2, y + 1, c('d'))
-    put(g, x + 5, y + 1, c('d'))
-    put(g, x + 7, y - 1, c('q'))
-  } else {
-    rect(g, x + 2, y + 1, x + 2, y + 1, c('k'))
-    rect(g, x + 5, y + 1, x + 5, y + 1, c('k'))
-  }
-  for (const lx of [x + 2, x + 5]) put(g, lx, y + 3, c('d'))
-  put(g, x, y + 1, c('o'))
-  put(g, x + 7, y + (f % 2 === 0 ? 1 : 0), c('o'))
-  if (mood === 'sweat') put(g, x + 7, y - 1, c('c'))
-}

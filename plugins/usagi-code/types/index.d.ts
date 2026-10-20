@@ -42,7 +42,6 @@ declare module 'claude-code' {
       idleSince: number | null
       usage: UsageSnapshot
       dialog: Dialog
-      screensaver: boolean
       compactAt: number | null
       stageRows: number
     }

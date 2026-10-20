@@ -64,7 +64,7 @@ describe('stageCells', () => {
 })
 
 describe('rasterFrames', () => {
-  const stage = { cols: 46, rows: STAGE_ROWS, pose: 'coding' as const, hat: 'none' as const, theme: 'windows7' as const, idleSince: null, screensaver: null }
+  const stage = { cols: 46, rows: STAGE_ROWS, pose: 'coding' as const, hat: 'none' as const, theme: 'windows7' as const, idleSince: null }
 
   test('draws one stage raster for the studio', () => {
     const frames = rasterFrames({ stage }, 0, 0)

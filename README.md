@@ -52,13 +52,13 @@ Types while a tool runs, shows a thinking bubble between steps, and stands by wh
 <tr>
 <td width="50%" valign="middle">
 
-#### Screensaver
+#### Dozing
 
-Walk away and the stage turns into a 90s screensaver (growing pipes, a starfield, tiny flying mascots) until Claude moves again.
+After a quiet minute Usagi dozes off where it stands: eyes closed, breathing up and down, a snot bubble swelling and popping, `z` drifting up. It wakes as soon as Claude moves again.
 
 </td>
 <td width="50%">
-  <img src="plugins/usagi-code/assets/screensaver.gif" alt="Starfield and pipes screensaver" width="100%" />
+  <img src="plugins/usagi-code/assets/doze.gif" alt="Usagi dozing with closed eyes and a snot bubble" width="100%" />
 </td>
 </tr>
 </table>
@@ -90,7 +90,7 @@ Walk away and the stage turns into a 90s screensaver (growing pipes, a starfield
 
 **Where the pane sits is up to Claude Code.** In the fullscreen layout (the default) a terminal 110 columns or wider docks it to the right of the conversation (Usagi asks for a 46-column dock so the stage fits); narrower, it sits above the prompt. To keep it above the prompt, start with `CLAUDE_CODE_NO_FLICKER=0 claude` or run inside tmux.
 
-Lasting settings (open on startup, screensaver minutes, theme) live in `/plugin configure usagi-code`. Terminal only.
+Lasting settings (open on startup, theme) live in `/plugin configure usagi-code`. Terminal only.
 
 ### Credits
 
