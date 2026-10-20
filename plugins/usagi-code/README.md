@@ -63,6 +63,12 @@ Walk away and the stage turns into a 90s screensaver (growing pipes, a starfield
 | `/usagi theme <windows7 \| macos \| ubuntu>` | Switch the look for this session |
 
 > **Usagi looks most natural at 22, 20 and 18 rows.** Those sizes use hand-drawn art as is; other sizes scale the 22-row art and can drop pixels, so the eyes may look off. `/usagi size 22` brings back the default.
+>
+> Here is how the resolution differs by size (left to right: thinking, typing, standing). Use it as a reference when picking a size.
+
+<p align="center">
+  <img src="assets/sizes.png" alt="Usagi at 22, 20 and 18 rows, resolution compared" width="720" />
+</p>
 
 Lasting settings (open on startup, screensaver minutes, theme) live in `/plugin configure usagi-code`. Terminal only.
 
