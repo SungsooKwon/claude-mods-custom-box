@@ -11,9 +11,10 @@ listed="$(jq -r '.plugins[].name' .claude-plugin/marketplace.json | sort)"
 folders="$(ls plugins | sort)"
 [[ "$listed" == "$folders" ]] || { echo "marketplace.json and plugins/ differ:"; diff <(echo "$listed") <(echo "$folders"); exit 1; }
 for m in $folders; do
-  # 한국어·영어 표에 한 줄씩
-  [[ "$(grep -c "](plugins/$m)" README.md)" -eq 2 ]] || { echo "README tables need one row each (ko, en) for $m" >&2; exit 1; }
-  [[ -f "plugins/$m/README.md" ]] || { echo "missing plugins/$m/README.md" >&2; exit 1; }
+  for f in README.md README.ko.md; do
+    [[ "$(grep -c "](plugins/$m[)/]" $f)" -eq 1 ]] || { echo "$f table needs one row for $m" >&2; exit 1; }
+    [[ -f "plugins/$m/$f" ]] || { echo "missing plugins/$m/$f" >&2; exit 1; }
+  done
 done
 
 mods=("$@")

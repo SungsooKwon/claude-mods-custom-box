@@ -30,28 +30,11 @@ export const register: Register = on => {
   on('command.run', { command: '$name' }, async () => ({ text: '$name is installed.' }))
 }
 TSX
+switch() { printf '<p align="center">\n  <sub>%s</sub>\n</p>' "$1"; }
 cat > "$dir/README.md" <<MD
 <h1 align="center">$name</h1>
 
-<details>
-<summary><b>한국어</b></summary>
-
-$desc_ko
-
-\`\`\`
-/plugin install $name@claude-mods-custom-box
-\`\`\`
-
-## 사용법
-
-| 명령 | 동작 |
-| --- | --- |
-| \`/$name\` | |
-
-</details>
-
-<details open>
-<summary><b>English</b></summary>
+$(switch 'English · <a href="README.ko.md">한국어</a>')
 
 $desc
 
@@ -64,8 +47,23 @@ $desc
 | Command | What it does |
 | --- | --- |
 | \`/$name\` | |
+MD
+cat > "$dir/README.ko.md" <<MD
+<h1 align="center">$name</h1>
 
-</details>
+$(switch '<a href="README.md">English</a> · 한국어')
+
+$desc_ko
+
+\`\`\`
+/plugin install $name@claude-mods-custom-box
+\`\`\`
+
+## 사용법
+
+| 명령 | 동작 |
+| --- | --- |
+| \`/$name\` | |
 MD
 
 m="$root/.claude-plugin/marketplace.json"
@@ -73,14 +71,15 @@ jq --arg n "$name" --arg d "$desc" \
   '.plugins += [{name: $n, source: ("./plugins/" + $n), description: $d}]' "$m" > "$m.tmp"
 mv "$m.tmp" "$m"
 
-# README 표의 끝 표시 바로 위에 한 줄씩 넣는다 (미리보기는 그림을 넣기 전까지 —)
-readme="$root/README.md"
-row() { printf '| — | [**%s**](plugins/%s) | %s |' "$name" "$name" "$1"; }
-ROW_KO="$(row "$desc_ko")" ROW_EN="$(row "$desc")" awk '
-  /<!-- mods:ko:end -->/ { print ENVIRON["ROW_KO"] }
-  /<!-- mods:en:end -->/ { print ENVIRON["ROW_EN"] }
-  { print }' "$readme" > "$readme.tmp"
-mv "$readme.tmp" "$readme"
+# 두 README 표의 끝 표시 바로 위에 한 줄씩 (미리보기는 그림을 넣기 전까지 —)
+add_row() {
+  ROW="$(printf '| — | [**%s**](plugins/%s%s) | %s |' "$name" "$name" "$2" "$3")" awk '
+    /<!-- mods:end -->/ { print ENVIRON["ROW"] }
+    { print }' "$1" > "$1.tmp"
+  mv "$1.tmp" "$1"
+}
+add_row "$root/README.md" "" "$desc"
+add_row "$root/README.ko.md" "/README.ko.md" "$desc_ko"
 
 echo "created plugins/$name"
 echo "develop: claude --plugin-dir plugins/$name"
