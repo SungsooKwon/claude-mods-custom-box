@@ -13,6 +13,8 @@ const CONTENT_MAX = 16
 // 사용자가 ▲▼ 로 고르는 캐릭터 높이 범위
 export const STAGE_ROWS_MIN = 4
 export const STAGE_ROWS_MAX = 44
+/** 오른쪽에 붙을 때(dock) 청하는 본문 폭: 위아래로 쌓아도 22줄 무대(42열)가 다 들어간다. */
+export const DOCK_COLS = SCENE_W + 6
 /** 캐릭터를 stageRows 줄로 다 보이는 데 드는 본문 줄 수, inline 으로 열 때 이만큼 청한다. */
 export const paneRows = (stageRows: number = STAGE_ROWS) => CHROME_ROWS + stageRows
 

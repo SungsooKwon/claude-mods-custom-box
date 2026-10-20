@@ -11,6 +11,14 @@ test('/usagi opens the pane, and closes it when open', { options: { openOnStartu
   expect(rec.closed).toEqual(['usagi-code'])
 })
 
+// 넓은 전체 화면에선 Claude Code 가 pane 을 오른쪽에 붙이니, 그때 무대가 다 들어가는 폭을 청한다
+test('asks for a 46-column dock wherever it opens the pane', async ($, on) => {
+  const { rec } = answerEngine(on)
+  await startSession($)
+  await $.command.run({ command: 'usagi', args: '+' } as never)
+  expect(rec.columns).toEqual([46, 46])
+})
+
 test('the pane is titled Usagi code with the project folder', async ($, on) => {
   const { rec } = answerEngine(on)
   await startSession($)

@@ -7,7 +7,7 @@ import { TICK_MS, rasterFrames } from './animator'
 import type { AnimModel, RasterKey } from './animator'
 import { formatElapsed, hatFor } from './calendar'
 import { QUESTION_TEXT, needsYouText, notifiedText, statusLine } from './alerts'
-import { STAGE_ROWS_MAX, STAGE_ROWS_MIN, layoutV2, paneRows } from './layout'
+import { DOCK_COLS, STAGE_ROWS_MAX, STAGE_ROWS_MIN, layoutV2, paneRows } from './layout'
 import { STAGE_ROWS } from './art/stage'
 import { THEMES, themeFor } from './themes'
 import type { Os } from './themes'
@@ -127,7 +127,7 @@ async function resizeStage($: EngineInterface, change: (last: number) => number)
   const size = await update($, stageRows, last => Math.max(STAGE_ROWS_MIN, Math.min(STAGE_ROWS_MAX, Math.round(change(last)))))
   await $.store.set('stageRows', size)
   // 사람이 테두리로 정한 크기가 있으면 그쪽이 이긴다
-  await $.ui.open({ id: PANE, title: paneTitle(), rows: paneRows(size) })
+  await $.ui.open({ id: PANE, title: paneTitle(), columns: DOCK_COLS, rows: paneRows(size) })
   return size
 }
 
@@ -204,7 +204,7 @@ export const register: Register = (on, options) => {
     }
     const hasTerminal = (await $.session.surfaces()).includes('terminal')
     if (options.openOnStartup !== false && hasTerminal) {
-      void $.ui.open({ id: PANE, title: paneTitle(), rows: paneRows(await read($, stageRows)) })
+      void $.ui.open({ id: PANE, title: paneTitle(), columns: DOCK_COLS, rows: paneRows(await read($, stageRows)) })
     }
     return next(e)
   })
@@ -235,7 +235,7 @@ export const register: Register = (on, options) => {
       await $.ui.close({ id: PANE })
       return { text: 'Usagi code closed.' }
     }
-    await $.ui.open({ id: PANE, title: paneTitle(), rows: paneRows(await read($, stageRows)) })
+    await $.ui.open({ id: PANE, title: paneTitle(), columns: DOCK_COLS, rows: paneRows(await read($, stageRows)) })
     return { text: 'Usagi code opened.' }
   })
 

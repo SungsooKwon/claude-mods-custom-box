@@ -88,6 +88,8 @@ Walk away and the stage turns into a 90s screensaver (growing pipes, a starfield
   <img src="plugins/usagi-code/assets/sizes.png" alt="Usagi at 22, 20, 18, 14 and 8 rows, resolution compared" width="720" />
 </p>
 
+**Where the pane sits is up to Claude Code.** In the fullscreen layout (the default) a terminal 110 columns or wider docks it to the right of the conversation (Usagi asks for a 46-column dock so the stage fits); narrower, it sits above the prompt. To keep it above the prompt, start with `CLAUDE_CODE_NO_FLICKER=0 claude` or run inside tmux.
+
 Lasting settings (open on startup, screensaver minutes, theme) live in `/plugin configure usagi-code`. Terminal only.
 
 ### Credits

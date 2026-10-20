@@ -88,6 +88,8 @@
   <img src="plugins/usagi-code/assets/sizes.png" alt="22·20·18·14·8줄 크기별 Usagi 해상도 비교" width="720" />
 </p>
 
+**pane 위치는 Claude Code 가 정합니다.** 전체 화면 모드(기본)에서 터미널이 110열 이상이면 대화 오른쪽에 붙고(이때 무대가 다 들어가는 46열 폭을 청합니다), 그보다 좁으면 프롬프트 위에 들어갑니다. 늘 프롬프트 위에 두려면 `CLAUDE_CODE_NO_FLICKER=0 claude` 로 실행하거나 tmux 안에서 실행하세요.
+
 계속 쓸 설정(시작할 때 열기, 화면보호기 분, 테마)은 `/plugin configure usagi-code` 에서 바꿉니다. 터미널 전용입니다.
 
 ### 출처

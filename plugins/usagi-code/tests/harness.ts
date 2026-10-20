@@ -11,6 +11,7 @@ export type Piece = { stream: 'stdout' | 'stderr'; text: string }
 export type Recorder = {
   opened: string[]
   titles: string[]
+  columns: (number | undefined)[]
   closed: string[]
   statuses: (string | undefined)[]
   toasts: string[]
@@ -63,7 +64,7 @@ export type Control = { usage: unknown; usageDeny?: string; store: Map<string, u
 
 export function answerEngine(on: On, opts: BootOptions = {}): { rec: Recorder; clock: MockClock; ctl: Control } {
   const ctl: Control = { usage: opts.usage ?? DEFAULT_USAGE, store: new Map(Object.entries(opts.store ?? {})) }
-  const rec: Recorder = { opened: [], titles: [], closed: [], statuses: [], toasts: [], blits: [], runs: [], spawns: [] }
+  const rec: Recorder = { opened: [], titles: [], columns: [], closed: [], statuses: [], toasts: [], blits: [], runs: [], spawns: [] }
   const open = new Map<string, string>()
   const clock = mock.clock(on, { now: opts.now ?? DEFAULT_NOW })
   mock.env(on, opts.os === 'windows' ? { OS: 'Windows_NT' } : {})
@@ -83,6 +84,7 @@ export function answerEngine(on: On, opts: BootOptions = {}): { rec: Recorder; c
     open.set(e.id, e.title ?? e.id)
     rec.opened.push(e.id)
     rec.titles.push(e.title ?? '')
+    rec.columns.push(e.columns)
     return { value: { isPlaced: true } } as never
   })
   on('ui.close', async (_$, e) => {
