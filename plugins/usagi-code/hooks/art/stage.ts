@@ -1,5 +1,5 @@
 import type { Hat, Pose } from '../../types'
-import { SCENE_H, SCENE_W, sceneFrame, sceneLabel } from './scene'
+import { SCENE_H, SCENE_W, sceneFrame, sceneLabel, sceneSize } from './scene'
 import { drawSprite, gridToWords, newGrid, textWords, wordsToCells } from './pixels'
 import type { Grid } from './pixels'
 
@@ -16,9 +16,9 @@ const mix = (a: number, b: number, t: number): number =>
   [16, 8, 0].reduce((out, s) => out | (Math.round(((a >> s) & 255) + (((b >> s) & 255) - ((a >> s) & 255)) * t) << s), 0)
 const hash = (x: number, y: number): number => (((x * 73856093) ^ (y * 19349663) ^ (x * y * 83492791)) >>> 0) % 1000
 
-/** 무대 (x, y) 픽셀의 풀밭 색. */
-export function meadow(x: number, y: number): number {
-  const base = mix(MEADOW_TOP, MEADOW_BOTTOM, (y / (SCENE_H - 1)) ** 0.8)
+/** 높이 h 인 무대 (x, y) 픽셀의 풀밭 색. */
+export function meadow(x: number, y: number, h = SCENE_H): number {
+  const base = mix(MEADOW_TOP, MEADOW_BOTTOM, (y / (h - 1)) ** 0.8)
   const r = hash(x, y)
   if (y > 8 && r < 10) return FLOWER
   if (y > 8 && r < 13) return FLOWER_CORE
@@ -33,7 +33,7 @@ export type StageOptions = {
   pose: Pose
   hat: Hat
   tick: number
-  /** 무대 줄 수, 22 보다 작으면 장면을 그만큼 줄여 그린다 (없으면 22). */
+  /** 무대 줄 수, 22·20·18 은 손으로 그린 장면, 그 밖은 22줄 장면을 맞춰 줄인다 (없으면 22). */
   rows?: number
   /** The theme's backdrop colour at scene pixel (x, y). */
   backdrop: (x: number, y: number) => number
@@ -42,18 +42,20 @@ export type StageOptions = {
 /** The Stage: a meadow across the full width and the scene centred (or clipped on the right when narrow). */
 export function stageCells(o: StageOptions): string {
   const rows = o.rows ?? STAGE_ROWS
-  const scale = rows / STAGE_ROWS
-  // 원래 크기로 그린 뒤 줄인다, 원래 크기면 그대로
+  // 손으로 그린 크기(22·20·18줄)는 그대로, 나머지는 22줄 장면을 그린 뒤 줄인다
+  const art = sceneSize(rows) === undefined ? STAGE_ROWS : rows
+  const { w: sceneW, h: sceneH } = sceneSize(art) ?? { w: SCENE_W, h: SCENE_H }
+  const scale = rows / art
   const cols = scale === 1 ? o.cols : Math.max(1, Math.round(o.cols / scale))
-  const full = newGrid(cols, SCENE_H, 0)
-  const x0 = cols >= SCENE_W + 2 ? Math.floor((cols - SCENE_W) / 2) : 1
-  for (let y = 0; y < SCENE_H; y++) {
-    for (let x = 0; x < cols; x++) full.px[y * cols + x] = meadow(x, y)
+  const full = newGrid(cols, sceneH, 0)
+  const x0 = cols >= sceneW + 2 ? Math.floor((cols - sceneW) / 2) : 1
+  for (let y = 0; y < sceneH; y++) {
+    for (let x = 0; x < cols; x++) full.px[y * cols + x] = meadow(x, y, sceneH)
   }
-  drawSprite(full, sceneFrame(o.pose, o.hat, o.tick), x0, 0)
+  drawSprite(full, sceneFrame(o.pose, o.hat, o.tick, art), x0, 0)
   const words = gridToWords(scale === 1 ? full : shrink(full, o.cols, rows * 2))
   // 말풍선 글자는 셀째로 덮어쓴다, 줄인 만큼 글자 수도 줄이고 무대 밖은 자른다
-  const label = sceneLabel(o.pose, o.tick)
+  const label = sceneLabel(o.pose, o.tick, art)
   if (label !== null) {
     const x = Math.round((x0 + label.x) * scale)
     const row = Math.round(label.row * scale)

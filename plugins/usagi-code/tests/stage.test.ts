@@ -39,6 +39,14 @@ describe('stageCells', () => {
     expect(decode(cells)).toContain(0xfaf1d0)
   })
 
+  // 20·18줄은 손으로 그린 도안이라 줄여도 두 눈의 반짝임 4px 이 다 남는다
+  test('keeps both eye glints at the hand-drawn 22, 20 and 18 rows', () => {
+    for (const [rows, cols] of [[22, 42], [20, 39], [18, 35]] as const) {
+      const words = decode(stageCells({ ...base, pose: 'idle', cols, rows }))
+      expect(words.filter((w, i) => i % 3 !== 0 && w === 0xf8fdf9)).toHaveLength(4)
+    }
+  })
+
   test('animates from tick to tick', () => {
     expect(stageCells({ ...base, cols: 46, tick: 0 })).not.toBe(stageCells({ ...base, cols: 46, tick: 1 }))
   })
