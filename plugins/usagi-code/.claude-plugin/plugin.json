@@ -1,0 +1,36 @@
+{
+  "name": "usagi-code",
+  "version": "0.2.0",
+  "description": "Usagi acts out what Claude is doing in a pane above the prompt, with the order, subagents and progress beside it. Ported from clockendbader/mascot-studio (MIT).",
+  "author": {
+    "name": "SungsooKwon"
+  },
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "openOnStartup": {
+      "type": "boolean",
+      "title": "Open on startup",
+      "description": "Open the studio when a session starts",
+      "default": true
+    },
+    "screensaverMinutes": {
+      "type": "number",
+      "title": "Screensaver minutes",
+      "description": "Idle minutes before the screensaver; 0 turns it off",
+      "default": 5
+    },
+    "theme": {
+      "type": "string",
+      "title": "Theme",
+      "description": "The 2010s look: auto matches your computer (Windows 7, Mac OS X or Ubuntu)",
+      "options": [
+        "auto",
+        "windows7",
+        "macos",
+        "ubuntu"
+      ],
+      "default": "auto"
+    }
+  }
+}

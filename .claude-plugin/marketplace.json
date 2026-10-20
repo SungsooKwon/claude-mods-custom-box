@@ -1,0 +1,14 @@
+{
+  "name": "claude-mods-custom-box",
+  "description": "Claude Code mods by SungsooKwon",
+  "owner": {
+    "name": "SungsooKwon"
+  },
+  "plugins": [
+    {
+      "name": "usagi-code",
+      "source": "./plugins/usagi-code",
+      "description": "Usagi acts out what Claude is doing in a pane above the prompt, with the order, subagents and progress beside it."
+    }
+  ]
+}
