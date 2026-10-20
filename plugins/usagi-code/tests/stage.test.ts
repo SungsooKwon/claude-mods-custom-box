@@ -39,11 +39,22 @@ describe('stageCells', () => {
     expect(decode(cells)).toContain(0xfaf1d0)
   })
 
-  // 20·18줄은 손으로 그린 도안이라 줄여도 두 눈의 반짝임 4px 이 다 남는다
-  test('keeps both eye glints at the hand-drawn 22, 20 and 18 rows', () => {
-    for (const [rows, cols] of [[22, 42], [20, 39], [18, 35]] as const) {
+  // 20·18·14줄은 손으로 그린 도안이라 줄여도 두 눈의 반짝임 4px 이 다 남는다
+  test('keeps both eye glints at the hand-drawn 22, 20, 18 and 14 rows', () => {
+    for (const [rows, cols] of [[22, 42], [20, 39], [18, 35], [14, 28]] as const) {
       const words = decode(stageCells({ ...base, pose: 'idle', cols, rows }))
       expect(words.filter((w, i) => i % 3 !== 0 && w === 0xf8fdf9)).toHaveLength(4)
+    }
+  })
+
+  // 18줄 이하는 말풍선을 점으로 줄여 토끼를 무대 가운데 둔다
+  test('centres Usagi on the small hand-drawn stages', () => {
+    for (const [rows, cols] of [[18, 35], [14, 28], [8, 17]] as const) {
+      const words = decode(stageCells({ ...base, pose: 'idle', cols, rows }))
+      const inked = [...Array(cols).keys()].filter(col =>
+        [...Array(rows).keys()].some(row => words.slice((row * cols + col) * 3 + 1, (row * cols + col) * 3 + 3).includes(0x492821)),
+      )
+      expect(Math.abs((inked[0]! + inked.at(-1)!) / 2 - (cols - 1) / 2)).toBeLessThanOrEqual(1)
     }
   })
 

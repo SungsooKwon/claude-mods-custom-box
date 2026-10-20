@@ -33,7 +33,7 @@ export type StageOptions = {
   pose: Pose
   hat: Hat
   tick: number
-  /** 무대 줄 수, 22·20·18 은 손으로 그린 장면, 그 밖은 22줄 장면을 맞춰 줄인다 (없으면 22). */
+  /** 무대 줄 수, 22·20·18·14·8 은 손으로 그린 장면, 그 밖은 22줄 장면을 맞춰 줄인다 (없으면 22). */
   rows?: number
   /** The theme's backdrop colour at scene pixel (x, y). */
   backdrop: (x: number, y: number) => number
@@ -42,7 +42,7 @@ export type StageOptions = {
 /** The Stage: a meadow across the full width and the scene centred (or clipped on the right when narrow). */
 export function stageCells(o: StageOptions): string {
   const rows = o.rows ?? STAGE_ROWS
-  // 손으로 그린 크기(22·20·18줄)는 그대로, 나머지는 22줄 장면을 그린 뒤 줄인다
+  // 손으로 그린 크기(22·20·18·14·8줄)는 그대로, 나머지는 22줄 장면을 그린 뒤 줄인다
   const art = sceneSize(rows) === undefined ? STAGE_ROWS : rows
   const { w: sceneW, h: sceneH } = sceneSize(art) ?? { w: SCENE_W, h: SCENE_H }
   const scale = rows / art

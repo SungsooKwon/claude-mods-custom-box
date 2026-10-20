@@ -68,7 +68,7 @@ Walk away and the stage turns into a 90s screensaver (growing pipes, a starfield
 - **Heads-up popups** — a permission prompt or a question pops a dialog (“Usagi: hey! i need ur OK …”); a failed tool shows its first error line.
 - **Usage warnings** — context %, 5-hour and weekly limits in the status bar, with a nudge toward `/compact` and the reset time when you get close.
 - **2010s skins** — Windows 7, Mac OS X and Ubuntu themes, picked from your OS or set by hand.
-- **Resizable stage** — ▲ ▼ in the status bar, or `/usagi +` / `/usagi -`; the size is kept across sessions. 22, 20 and 18 rows each have hand-drawn art.
+- **Resizable stage** — ▲ ▼ in the status bar, or `/usagi +` / `/usagi -`; the size is kept across sessions. 22, 20, 18, 14 and 8 rows each have hand-drawn art. At 18 rows and below Usagi stands centred and the thinking bubble shows only dots (. .. ...).
 
 > The pane's labels are in Korean for now.
 
@@ -80,12 +80,12 @@ Walk away and the stage turns into a 90s screensaver (growing pipes, a starfield
 | `/usagi +` · `/usagi -` · `/usagi size <n>` | Resize Usagi (rows) |
 | `/usagi theme <windows7 \| macos \| ubuntu>` | Switch the look for this session |
 
-> **Usagi looks most natural at 22, 20 and 18 rows.** Those sizes use hand-drawn art as is; other sizes scale the 22-row art and can drop pixels, so the eyes may look off. `/usagi size 22` brings back the default.
+> **Usagi looks most natural at 22, 20, 18, 14 and 8 rows.** Those sizes use hand-drawn art as is; other sizes scale the 22-row art and can drop pixels, so the eyes may look off. `/usagi size 22` brings back the default.
 >
 > Here is how the resolution differs by size (left to right: thinking, typing, standing). Use it as a reference when picking a size.
 
 <p align="center">
-  <img src="plugins/usagi-code/assets/sizes.png" alt="Usagi at 22, 20 and 18 rows, resolution compared" width="720" />
+  <img src="plugins/usagi-code/assets/sizes.png" alt="Usagi at 22, 20, 18, 14 and 8 rows, resolution compared" width="720" />
 </p>
 
 Lasting settings (open on startup, screensaver minutes, theme) live in `/plugin configure usagi-code`. Terminal only.
