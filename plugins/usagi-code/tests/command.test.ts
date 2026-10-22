@@ -32,3 +32,12 @@ test('/usagi + and /usagi size resize Usagi without a click', async ($, on) => {
   expect(await $.command.run({ command: 'usagi', args: 'size 99' } as never)).toMatchObject({ text: 'Usagi size 44 rows.' })
   expect(ctl.store.get('stageRows')).toBe(44)
 })
+
+// 캐릭터 명령도 /usagi 와 같은 말로 크기를 바꾸고, 그 캐릭터를 무대에 세운다
+test('/chiikawa - and /chiikawa size resize Chiikawa', async ($, on) => {
+  const { ctl } = answerEngine(on)
+  await startSession($)
+  expect(await $.command.run({ command: 'chiikawa', args: '-' } as never)).toMatchObject({ text: 'Chiikawa size 20 rows.' })
+  expect(await $.command.run({ command: 'chiikawa', args: 'size 14' } as never)).toMatchObject({ text: 'Chiikawa size 14 rows.' })
+  expect(ctl.store.get('stageRows')).toBe(14)
+})

@@ -3,7 +3,6 @@ import { formatReset } from './calendar'
 
 export const WARN_AT = 80
 export const CRITICAL_AT = 95
-const MASCOT = 'Usagi:'
 
 export type Level = 'ok' | 'warn' | 'critical'
 
@@ -41,7 +40,7 @@ export function costLabel(s: UsageSnapshot): 'Est. cost' | 'Cost' {
 const LIMIT_NAMES: Readonly<Record<string, string>> = { five_hour: '5-hour limit', seven_day: 'weekly limit' }
 
 /** The status-line warning for the highest figure at 80% or more. */
-export function usageWarning(s: UsageSnapshot, now: Date): string | undefined {
+export function usageWarning(s: UsageSnapshot, now: Date, mascot = 'Usagi'): string | undefined {
   const candidates: { pct: number; text: string }[] = []
   if (s.contextPercent !== undefined) candidates.push({ pct: s.contextPercent, text: `context ${s.contextPercent}% · consider /compact` })
   for (const l of s.rateLimits) {
@@ -50,7 +49,7 @@ export function usageWarning(s: UsageSnapshot, now: Date): string | undefined {
     candidates.push({ pct: l.percentUsed, text: `${name} ${l.percentUsed}%${reset === '' ? '' : ` · resets ${reset}`}` })
   }
   const top = candidates.filter(c => c.pct >= WARN_AT).sort((a, b) => b.pct - a.pct)[0]
-  return top === undefined ? undefined : `${MASCOT} ${top.text}`
+  return top === undefined ? undefined : `${mascot}: ${top.text}`
 }
 
 

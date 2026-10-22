@@ -6,9 +6,11 @@ import { finishKeyframe, firstLine, parseClientMessage, poseForTool, startKeyfra
 import { TICK_MS, rasterFrames } from './animator'
 import type { AnimModel, RasterKey } from './animator'
 import { formatElapsed, hatFor } from './calendar'
-import { QUESTION_TEXT, needsYouText, notifiedText, statusLine } from './alerts'
+import { needsYouText, notifiedText, questionText, statusLine } from './alerts'
 import { DOCK_COLS, STAGE_ROWS_MAX, STAGE_ROWS_MIN, layoutV2, paneRows } from './layout'
 import { STAGE_ROWS } from './art/stage'
+import { CHARACTERS, characterFor } from './art/characters'
+import type { CharacterId } from './art/characters'
 import { THEMES, themeFor } from './themes'
 import type { Os } from './themes'
 import { segmentsText, statusSegments, titleSegments } from './views/chrome'
@@ -27,6 +29,7 @@ const ERROR_DIALOG_MS = 8000
 const activity = atom({ plugin: 'usagi-code', key: 'activity' } as const, { pose: 'idle', since: 0 } as Activity)
 const keyframes = atom({ plugin: 'usagi-code', key: 'keyframes' } as const, [] as Keyframe[])
 const themeOverride = atom({ plugin: 'usagi-code', key: 'themeOverride' } as const, null as ThemeName | null)
+const characterOverride = atom({ plugin: 'usagi-code', key: 'characterOverride' } as const, null as CharacterId | null)
 const turnStartedAt = atom({ plugin: 'usagi-code', key: 'turnStartedAt' } as const, null as number | null)
 const idleSince = atom({ plugin: 'usagi-code', key: 'idleSince' } as const, null as number | null)
 const usage = atom({ plugin: 'usagi-code', key: 'usage' } as const, { rateLimits: [], toolCalls: 0 } as UsageSnapshot)
@@ -60,10 +63,14 @@ const paneTitle = () => `Usagi code · ${folder}`
 const OS: Os = 'linux'
 /** The status line as last set, so it is only set again when it changes. */
 let lastStatus: string | undefined
+/** 설정(character)으로 정한 캐릭터, 캐릭터 명령(/chiikawa 등)은 이번 세션만 다른 캐릭터를 세운다. 알림 문구의 이름도 무대에 선 캐릭터를 따른다. */
+let configured: CharacterId = 'usagi'
+const onStage = async ($: EngineInterface): Promise<CharacterId> => (await read($, characterOverride)) ?? configured
+const mascot = async ($: EngineInterface): Promise<string> => CHARACTERS[await onStage($)].name
 
 /** Sets the plugin's status line from the dialog and the usage warning, when the text changed. */
 async function refreshStatus($: EngineInterface): Promise<void> {
-  const text = statusLine(await read($, dialog), usageWarning(await read($, usage), new Date(await $.clock.now())))
+  const text = statusLine(await read($, dialog), usageWarning(await read($, usage), new Date(await $.clock.now()), await mascot($)), await mascot($))
   if (text === lastStatus) return
   lastStatus = text
   $.ui.status(text)
@@ -152,9 +159,10 @@ function failureOf(result: unknown): string | undefined {
 }
 
 export const register: Register = (on, options) => {
+  configured = characterFor(String(options.character ?? 'usagi'))
   on('session.start', async ($, e, next) => {
     folder = folderOf(e.cwd)
-    await $.command.register({ name: 'usagi', description: 'Open or close Usagi code' })
+    for (const [id, { name }] of Object.entries(CHARACTERS)) await $.command.register({ name: id, description: `Open or close Usagi code with ${name} on stage` })
     await refreshCompactAt($)
     const kept = Number(await $.store.get('stageRows'))
     if (Number.isFinite(kept) && kept > 0) await update($, stageRows, () => Math.max(STAGE_ROWS_MIN, Math.min(STAGE_ROWS_MAX, kept)))
@@ -196,35 +204,41 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
-  on('command.run', { command: 'usagi' }, async ($, e) => {
-    if (!(await $.session.surfaces()).includes('terminal')) return { text: TERMINAL_ONLY }
-    const [verb = '', arg = ''] = String((e as { args?: unknown }).args ?? '').trim().toLowerCase().split(/\s+/)
-    const isOpen = (await $.ui.panes()).some(pane => pane.id === PANE)
-    if (verb === 'theme') {
-      const chosen = lookup<(typeof THEMES)[ThemeName]>(THEMES, arg)
-      if (chosen === undefined) return { text: 'Themes: windows7, macos, ubuntu. To keep one, set Theme with /plugin configure.' }
-      await update($, themeOverride, () => chosen.name)
-      return { text: `Theme set to ${chosen.label} (this session).` }
-    }
-    // 일반 화면 모드에선 ▲▼ 클릭이 안 닿아서 명령으로도 받는다
-    if (verb === '+' || verb === '-' || verb === 'size') {
-      const wanted = Number(arg)
-      if (verb === 'size' && !Number.isFinite(wanted)) return { text: `Usage: /usagi size <${STAGE_ROWS_MIN}-${STAGE_ROWS_MAX}>, or /usagi + / /usagi -.` }
-      const size = await resizeStage($, last => (verb === 'size' ? wanted : last + (verb === '+' ? STAGE_STEP : -STAGE_STEP)))
-      return { text: `Usagi size ${size} rows.` }
-    }
-    if (verb !== '') {
-      return {
-        text: 'Try /usagi, /usagi + | - | size <n>, or /usagi theme <windows7 | macos | ubuntu>.',
+  // 캐릭터마다 같은 명령 (/usagi, /chiikawa): 쓰면 그 캐릭터가 이번 세션 무대에 선다
+  for (const id of Object.keys(CHARACTERS) as CharacterId[]) {
+    const { name } = CHARACTERS[id]
+    on('command.run', { command: id }, async ($, e) => {
+      if (!(await $.session.surfaces()).includes('terminal')) return { text: TERMINAL_ONLY }
+      const [verb = '', arg = ''] = String((e as { args?: unknown }).args ?? '').trim().toLowerCase().split(/\s+/)
+      if (!['', 'theme', '+', '-', 'size'].includes(verb)) {
+        return { text: `Try /${id}, /${id} + | - | size <n>, or /${id} theme <windows7 | macos | ubuntu>.` }
       }
-    }
-    if (isOpen) {
-      await $.ui.close({ id: PANE })
-      return { text: 'Usagi code closed.' }
-    }
-    await $.ui.open({ id: PANE, title: paneTitle(), columns: DOCK_COLS, rows: paneRows(await read($, stageRows)) })
-    return { text: 'Usagi code opened.' }
-  })
+      const isOpen = (await $.ui.panes()).some(pane => pane.id === PANE)
+      const switched = (await onStage($)) !== id
+      await update($, characterOverride, () => id)
+      if (verb === 'theme') {
+        const chosen = lookup<(typeof THEMES)[ThemeName]>(THEMES, arg)
+        if (chosen === undefined) return { text: 'Themes: windows7, macos, ubuntu. To keep one, set Theme with /plugin configure.' }
+        await update($, themeOverride, () => chosen.name)
+        return { text: `Theme set to ${chosen.label} (this session).` }
+      }
+      // 일반 화면 모드에선 ▲▼ 클릭이 안 닿아서 명령으로도 받는다
+      if (verb === '+' || verb === '-' || verb === 'size') {
+        const wanted = Number(arg)
+        if (verb === 'size' && !Number.isFinite(wanted)) return { text: `Usage: /${id} size <${STAGE_ROWS_MIN}-${STAGE_ROWS_MAX}>, or /${id} + / /${id} -.` }
+        const size = await resizeStage($, last => (verb === 'size' ? wanted : last + (verb === '+' ? STAGE_STEP : -STAGE_STEP)))
+        return { text: `${name} size ${size} rows.` }
+      }
+      // 다른 캐릭터가 서 있던 pane 은 닫지 않고 바꿔 세운다
+      if (isOpen && switched) return { text: `${name} is on stage (this session). To keep it, set Character with /plugin configure.` }
+      if (isOpen) {
+        await $.ui.close({ id: PANE })
+        return { text: 'Usagi code closed.' }
+      }
+      await $.ui.open({ id: PANE, title: paneTitle(), columns: DOCK_COLS, rows: paneRows(await read($, stageRows)) })
+      return { text: 'Usagi code opened.' }
+    })
+  }
 
   on('tool.call', async ($, e, next) => {
     let id = ''
@@ -242,7 +256,7 @@ export const register: Register = (on, options) => {
       await update($, activity, () => ({ pose, tool, target, since: started }))
       await update($, idleSince, () => null)
       await clearDialog($, 'error')
-      if (tool === 'AskUserQuestion') await setDialog($, { kind: 'needs-you', text: QUESTION_TEXT, at: started })
+      if (tool === 'AskUserQuestion') await setDialog($, { kind: 'needs-you', text: questionText(await mascot($)), at: started })
     } catch {
       // the studio never stands in the way of a tool call
     }
@@ -340,7 +354,7 @@ export const register: Register = (on, options) => {
   on('classic.PermissionRequest', async ($, e, next) => {
     try {
       const target = targetOf((e.tool_input ?? {}) as Record<string, unknown>)
-      await needsYou($, needsYouText(e.tool_name, target))
+      await needsYou($, needsYouText(e.tool_name, target, await mascot($)))
     } catch {
       // observing only: the person decides, never the studio
     }
@@ -350,7 +364,7 @@ export const register: Register = (on, options) => {
   on('classic.Notification', async ($, e, next) => {
     try {
       if (e.notification_type === 'permission_prompt' && (await read($, dialog))?.kind !== 'needs-you') {
-        await needsYou($, notifiedText(e.message))
+        await needsYou($, notifiedText(e.message, await mascot($)))
       }
     } catch {
       // observing only
@@ -429,6 +443,7 @@ export const register: Register = (on, options) => {
         hat: hatFor(new Date(at)),
         theme: theme.name,
         idleSince: quietSince,
+        character: await onStage($),
       }
     }
     const rasters = rasterFrames(model, tick, at)

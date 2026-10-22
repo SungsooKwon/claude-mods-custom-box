@@ -1,6 +1,6 @@
 import { test, expect, describe } from 'claude-code/testing'
 import type { Engine, MockClock } from 'claude-code/testing'
-import { QUESTION_TEXT, needsYouText } from '../hooks/alerts'
+import { questionText, needsYouText } from '../hooks/alerts'
 import type { RowSegment } from '../hooks/client/row'
 import { THEMES } from '../hooks/themes'
 import type { ThemeName } from '../types'
@@ -20,7 +20,7 @@ async function view($: Engine) {
 
 test('needsYouText and the question text', () => {
   expect(needsYouText('Bash', 'npm test')).toBe('Usagi: hey! i need ur OK to run Bash: npm test')
-  expect(QUESTION_TEXT).toBe('Usagi: hey! i have a question for you')
+  expect(questionText()).toBe('Usagi: hey! i have a question for you')
 })
 
 describe('error dialog', () => {
@@ -158,7 +158,7 @@ describe('needs you', () => {
     const asked = $.tool.call({ tool: 'AskUserQuestion', tool_use_id: 'q1', questions: [] } as never)
     await waitFor(clock, () => answer !== undefined)
     const during = await view($)
-    expect(await during.ui.find({ type: 'Text', text: QUESTION_TEXT })).toBeDefined()
+    expect(await during.ui.find({ type: 'Text', text: questionText() })).toBeDefined()
     await during.ui.unmount()
     answer?.()
     await asked

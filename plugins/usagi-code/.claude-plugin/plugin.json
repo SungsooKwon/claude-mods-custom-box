@@ -1,7 +1,7 @@
 {
   "name": "usagi-code",
   "version": "0.2.0",
-  "description": "Usagi acts out what Claude is doing in a pane above the prompt, with the order, subagents and progress beside it. Ported from clockendbader/mascot-studio (MIT).",
+  "description": "Usagi or Chiikawa acts out what Claude is doing in a pane above the prompt, with the order, subagents and progress beside it. Ported from clockendbader/mascot-studio (MIT).",
   "author": {
     "name": "SungsooKwon"
   },
@@ -25,6 +25,16 @@
         "ubuntu"
       ],
       "default": "auto"
+    },
+    "character": {
+      "type": "string",
+      "title": "Character",
+      "description": "Who stands on the stage",
+      "options": [
+        "usagi",
+        "chiikawa"
+      ],
+      "default": "usagi"
     }
   }
 }

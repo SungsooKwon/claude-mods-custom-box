@@ -45,10 +45,10 @@ export function rect(g: Grid, x0: number, y0: number, x1: number, y1: number, co
 }
 
 /** Draws palette-character rows with their top-left at (x, y); `.` leaves the grid as it is. */
-export function stamp(g: Grid, rows: readonly string[], x: number, y: number): void {
+export function stamp(g: Grid, rows: readonly string[], x: number, y: number, palette = CLAWD_PALETTE): void {
   rows.forEach((row, dy) => {
     ;[...row].forEach((ch, dx) => {
-      const color = CLAWD_PALETTE[ch]
+      const color = palette[ch]
       if (ch !== '.' && color !== undefined) put(g, x + dx, y + dy, color)
     })
   })

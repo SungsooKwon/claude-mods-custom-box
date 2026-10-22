@@ -1,5 +1,6 @@
 import { test, expect, describe } from 'claude-code/testing'
 import { POSE_FRAMES, SCENE_H, SCENE_W, sceneFrame, sceneLabel } from '../hooks/art/scene'
+import { CHARACTERS, characterFor } from '../hooks/art/characters'
 import type { Pose } from '../types'
 
 const POSES = Object.keys(POSE_FRAMES) as Pose[]
@@ -47,4 +48,23 @@ test('thinking shows a white bubble with its word laid over the stage', () => {
   expect(has('idle', 0xffffff)).toBe(false)
   expect(sceneLabel('thinking', 2)?.text.trim()).toBe('thinking..')
   expect(sceneLabel('coding', 2)).toBeNull()
+})
+
+// 새 캐릭터를 올릴 때 도안이 배치표 무대 밖으로 넘치지 않는지 본다
+test('every character fits its art inside each hand-drawn scene', () => {
+  for (const { layouts } of Object.values(CHARACTERS)) {
+    for (const { w, h, art, rx, ry } of Object.values(layouts)) {
+      expect(new Set(art.map(line => line.length)).size).toBe(1)
+      expect(rx + art[0]!.length).toBeLessThanOrEqual(w)
+      expect(ry + art.length + 1).toBeLessThanOrEqual(h) // 졸 때 1px 내려간다
+    }
+  }
+})
+
+test('chiikawa stands in white instead of the cream rabbit', () => {
+  const px = [...sceneFrame('idle', 'none', 0, 22, 'chiikawa').px]
+  expect(px).toContain(CHARACTERS.chiikawa.palette.o)
+  expect(px).not.toContain(CREAM)
+  expect(characterFor('chiikawa')).toBe('chiikawa')
+  expect(characterFor('toString')).toBe('usagi')
 })

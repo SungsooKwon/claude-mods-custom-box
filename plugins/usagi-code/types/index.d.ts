@@ -1,4 +1,5 @@
 export type ThemeName = 'windows7' | 'macos' | 'ubuntu'
+export type CharacterId = 'usagi' | 'chiikawa'
 export type Hat = 'none' | 'pumpkin' | 'santa' | 'party' | 'heart'
 export type Pose = 'thinking' | 'coding' | 'reading' | 'terminal' | 'browsing' | 'helper' | 'oops' | 'waving' | 'done' | 'idle' | 'asleep'
 /** 이번 지시로 만들어진 서브에이전트 하나: 종류, 맡은 일, 상태, 지금 쓰는 도구 */
@@ -38,6 +39,7 @@ declare module 'claude-code' {
       subagents: SubAgent[]
       turnFrom: number | null
       themeOverride: ThemeName | null
+      characterOverride: CharacterId | null
       turnStartedAt: number | null
       idleSince: number | null
       usage: UsageSnapshot
